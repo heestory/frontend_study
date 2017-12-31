@@ -18,3 +18,7 @@ body{
 	margin: auto;
 	border: solid 1px;
 }
+
+.none{
+	display:none;
+}
