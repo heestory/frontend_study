@@ -97,13 +97,20 @@ lite.fn.append = function(stringOrObject){
 	});
 };
 
-lite.fn.createSlide = function(picArray){
-	var len = picArray.length;
-
-	for(var i = 0; i<len; i++){
-        this.append('<div style = "width:500px; height:500px; text-align: center"class="">' +
-			'<img src="'+picArray[i]+'" style="width: 100%; max-width: 760px; vertical-align: middle">' +
-			'</div>');
-	}
+lite.fn.createSlide = function(picArray, width){
+	
+	var div = this.createSlideTemplate(picArray, width);
+	this.append(div);
 };
+
+lite.fn.createSlideTemplate = function(picArray, width){
+	var len = picArray.length;
+	var width = width;
+	var html = "<div style='position:absolute; margin:auto; left:0; top:0; bottom:0; right:0;width:600px; height:600px; border:1px solid black;'>";
+	for(var i = 0; i<len; i++){
+        html +=	'<div style="width:'+width+'px">'+'<img src="'+picArray[i]+'"style="width:100%; height:100%;">' +'</div>';
+			
+	}
+	return html+"</div>";
+}
 

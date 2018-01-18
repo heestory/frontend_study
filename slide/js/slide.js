@@ -4,4 +4,4 @@ var img = [
     'img/flower3.jpg'
 ]
 
-console.log(lite('div').createSlide(img));
+lite('div').createSlide(img,400);
