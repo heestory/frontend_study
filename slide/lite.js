@@ -100,10 +100,11 @@ lite.fn.append = function(stringOrObject){
 lite.fn.createSlide = function(picArray, width){
 	
 	var div = this.createSlideTemplate(picArray, width);
-	var buttons = this.createButton();
-	//this.append(div);
-	this.append(buttons);
+    this.append(div);
+    this.initRendering('divWrap');
 
+	var buttons = this.createButton();
+	this.append(buttons);
 	this.listenButtonEvent(document.querySelector("div[name='rightButton']"));
 	this.listenButtonEvent(document.querySelector("div[name='leftButton']"));
 
@@ -112,12 +113,16 @@ lite.fn.createSlide = function(picArray, width){
 lite.fn.createSlideTemplate = function(picArray, width){
 	var len = picArray.length;
 	var width = width;
-	var html = "<div style='position:absolute; margin:auto; left:0; top:0; bottom:0; right:0;width:600px; height:600px; border:1px solid black;'>";
+	var html = "<div id='divWrap' style='position:absolute; margin:auto; left:0; top:0; bottom:0; right:0; width:"+width+"px;height:50%;'>";
 	for(var i = 0; i<len; i++){
-        html +=	'<div style="width:'+width+'px">'+'<img src="'+picArray[i]+'"style="width:100%; height:100%;">' +'</div>';
+
+        html +=	'<div style="width:'+width+'px">'+
+            '<img src="'+picArray[i]+'"style="width:100%; height:100%;">' +
+            '</div>';
 			
 	}
 	return html+"</div>";
+
 }
 lite.fn.createButton = function(){
 	var div = document.createElement('div');
@@ -139,7 +144,7 @@ lite.fn.createButton = function(){
 	lbutton.appendChild(ltext);
 	
 	this.setAttributes(lbutton,{'name':'leftButton', 'draggable':'true', 'ondragstart':'drag(event)','id':'leftButton'});
-	this.setAttributes(rbutton,{'name':'rightButton'});
+	this.setAttributes(rbutton,{'name':'rightButton','draggable':'true', 'ondragstart':'drag(event)','id':'rightButton'});
 	
 
 	buttonArray.push(rbutton);
@@ -151,26 +156,40 @@ lite.fn.createButton = function(){
 lite.fn.listenButtonEvent= function(el){
 	var clickCount = 0;
 	var dbFlag = false;
+	var wrapDiv = document.querySelector('#divWrap');
+	var imgChilds = wrapDiv.childNodes;
 	el.addEventListener('click',function(){
 			
-			clickCount++;
+	clickCount++;
 
-			if(clickCount === 1){
-			    singleClickTimer = setTimeout(function() {
-		            clickCount = 0;
-		            //@TODO
-		        }, 400);
+	if(clickCount === 1){
+		singleClickTimer = setTimeout(function() {
+			clickCount = 0;
+			var lastIndex = imgChilds.length -1;
 
-			}else if(clickCount === 2){
-
-				clearTimeout(singleClickTimer);
-		        clickCount = 0;
-		
-				dbFlag == true ? el.style.backgroundColor = 'green' : el.style.backgroundColor = 'white';
-				dbFlag == true ? el.classList.add("on") : el.classList.remove("on");
-				dbFlag == true ? dbFlag = false : dbFlag = true;
-				
+			for(var i = 0; i<imgChilds.length; i++){
+				if(imgChilds[i].className == 'active'){
+					imgChilds[i].removeAttribute('class')
+					imgChilds[i].style.display = 'none';
+					i == lastIndex ? imgChilds[0].setAttribute('class','active') : imgChilds[i+1].setAttribute('class','active');
+                    i == lastIndex ? imgChilds[0].style.display = '' : imgChilds[i+1].style.display = '';
+                    break;
+				}
 			}
+
+			//@TODO
+		}, 400);
+
+	}else if(clickCount === 2){
+
+		clearTimeout(singleClickTimer);
+		clickCount = 0;
+
+		dbFlag == true ? el.style.backgroundColor = 'green' : el.style.backgroundColor = 'white';
+		dbFlag == true ? el.classList.add("on") : el.classList.remove("on");
+		dbFlag == true ? dbFlag = false : dbFlag = true;
+
+	}
 
 		
 
@@ -210,5 +229,20 @@ function drop(event) {
     dm.style.top = (event.clientY + parseInt(offset[1],10)) + 'px';
     event.preventDefault();
     return false;
-}
+};
+
+
+
+lite.fn.initRendering = function (id) {
+
+    var divs = document.getElementById(id).children;
+    divs[0].setAttribute('class','active');
+
+    for(var i = 0; i<divs.length; i++){
+        (divs[i].className == 'active') || (divs[i].style.display = 'none');
+    }
+
+};
+
+
 
